@@ -11,7 +11,7 @@
   </style>
 </head>
 <body>
-  <header class="topbar"><div class="brand"><span class="brandmark"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19.4 8.3A8 8 0 1 0 21.8 14H14m7.8 0v5m0-5h-5"/></svg></span>British Auction RFQ</div><nav class="nav"><a href="hld.html">HLD</a><a class="active" href="schema_design.html">Schema design</a><a class="action" href="readme.html">Project README</a></nav></header>
+  <header class="topbar"><div class="brand"><span class="brandmark"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19.4 8.3A8 8 0 1 0 21.8 14H14m7.8 0v5m0-5h-5"/></svg></span>British Auction RFQ</div></header>
   <main class="wrap">
     <section class="hero"><div><div class="eyebrow">Data model · SQLAlchemy</div><h1>Schema<br>Design</h1><p>Six relational tables support user access, RFQ configuration, supplier quotes, runtime settings, and an auditable auction history.</p></div><aside class="hero-note"><strong>Ranking rule</strong>Quotes are ordered by <b>total price ascending</b>, then <b>transit days ascending</b>, then <b>first submitted</b>. The same ordering drives L1 and trigger evaluations.</aside></section>
 
@@ -54,7 +54,7 @@
 
     <h2 class="subhead">3. Data integrity notes</h2>
     <section class="note-grid"><article class="note"><h3>Calculated quote total</h3><p>The API derives total_amount as freight_charges + origin_charges + destination_charges. Clients do not choose the stored total independently.</p></article><article class="note"><h3>Auction deadline invariant</h3><p>Create and update paths reject forced_bid_close_time ≤ bid_close_time. Extensions use min(current close + Y, forced close).</p></article><article class="note"><h3>Database behavior</h3><p>SQLAlchemy models declare String/Float/Integer/Boolean/DateTime types. SQLite is the default runtime database. No migration framework or explicit bid-ranking composite index is currently present.</p></article></section>
-    <footer class="footer"><b>British Auction RFQ System</b> · This schema documents the current SQLAlchemy models, not a separate planned production schema. See <a href="hld.html">HLD</a>.</footer>
+    <footer class="footer"><b>British Auction RFQ System</b> · This schema documents the current SQLAlchemy models, not a separate planned production schema. See <a href="https://hld-nu.vercel.app/" target="_top">HLD</a>.</footer>
   </main>
   <script>
     (()=>{

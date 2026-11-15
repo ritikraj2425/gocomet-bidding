@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  <header class="topbar"><div class="brand"><span class="brandmark"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19.4 8.3A8 8 0 1 0 21.8 14H14m7.8 0v5m0-5h-5"/></svg></span>British Auction RFQ</div><nav class="nav"><a class="active" href="hld.html">HLD</a><a href="schema_design.html">Schema design</a><a class="action" href="readme.html">Project README</a></nav></header>
+  <header class="topbar"><div class="brand"><span class="brandmark"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19.4 8.3A8 8 0 1 0 21.8 14H14m7.8 0v5m0-5h-5"/></svg></span>British Auction RFQ</div></header>
   <main class="wrap">
     <section class="hero"><div><div class="eyebrow">High-level design · v1.0</div><h1>High-Level<br>Design</h1><p>A two-sided freight procurement platform where buyers publish RFQs and carriers compete through live, time-boxed bidding. The API, auction engine, and database run together in one FastAPI service.</p></div><aside class="hero-note"><strong>Core guarantee</strong>Each qualifying activity can extend the close time by <b>Y</b> minutes, while the forced close time remains an absolute ceiling.</aside></section>
 
@@ -61,7 +61,7 @@
       <article class="info-card"><h3>Runtime and persistence</h3><p>One APScheduler job checks state every 15 seconds. SQLAlchemy uses SQLite by default; DATABASE_URL can point to another SQLAlchemy-supported database with a matching driver.</p><span class="pill">UTC in API</span><span class="pill">IST in UI</span><span class="pill">Audit history</span></article>
       <article class="info-card"><h3>Project modules</h3><p>Admin screens cover RFQ creation and editing, supplier management, settings, and live monitoring. Supplier screens cover the public home, sign-in and registration, RFQ browsing, quote details, dashboard, and bid history. Backend domains include authentication, users, RFQs, bids, activity, and settings.</p></article>
     </section>
-    <footer class="footer"><b>British Auction RFQ System</b> · HLD reflects the current repository implementation. Schema details are in <a href="schema_design.html">Schema Design</a>. Run locally with <code>./start.sh</code>.</footer>
+    <footer class="footer"><b>British Auction RFQ System</b> · HLD reflects the current repository implementation. Schema details are in <a href="https://schemadesign.vercel.app/" target="_top">Schema Design</a>. Run locally with <code>./start.sh</code>.</footer>
   </main>
   <script>
     (()=>{
