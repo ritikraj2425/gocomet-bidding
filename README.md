@@ -1,89 +1,78 @@
-# British Auction in RFQ System
+# British Auction RFQ System
 
-A full-stack, enterprise Request for Quotation (RFQ) platform implementing **British Auction** mechanics with real-time bidding, automatic time extensions, and hard ceiling forced close enforcement.
+A freight procurement platform where an administrator publishes a request for quotation (RFQ) and suppliers compete in a live British auction. The system ranks bids, extends closing time when configured activity occurs, and records auction events for review.
 
-Built with **Python (FastAPI)**, **PostgreSQL / SQLAlchemy**, and **ReactJS (TypeScript + Ant Design)**.
+## At a glance
 
----
+| Part | Technology | Local address |
+| --- | --- | --- |
+| API and auction rules | FastAPI, SQLAlchemy, Uvicorn, WebSockets | `http://localhost:3000` |
+| Admin application | React, TypeScript, Vite, Ant Design | `http://localhost:5173` |
+| Supplier application | React, TypeScript, Vite, Ant Design | `http://localhost:5174` |
 
-## Architecture & Port Mapping
+The API serves interactive documentation at `http://localhost:3000/docs`. SQLite is the default database; `DATABASE_URL` can select another compatible SQLAlchemy database.
 
-| Service | Technology | Port | Credentials |
-|---|---|---|---|
-| **Backend API Server** | Python (FastAPI), SQLAlchemy, Uvicorn, WebSockets | `3000` | N/A (Swagger docs at `/docs`) |
-| **Admin Frontend** | React, TypeScript, Vite, Ant Design | `5173` | `admin@rfq.com` / `admin123` |
-| **Supplier Frontend** | React, TypeScript, Vite, Ant Design | `5174` | `supplier1@test.com` / `supplier123` (or self-register) |
+## How the auction works
 
----
+1. An administrator creates an RFQ, sets its schedule, and chooses the extension window (**X**), extension length (**Y**), and trigger rule.
+2. Suppliers submit an itemized quote, transit time, and validity date while bidding is open.
+3. Bids rank by lowest total price, then shortest transit time, then earliest submission.
+4. A configured trigger can extend the current closing time by **Y** minutes. The forced closing time is a hard limit.
+5. The system closes the auction and keeps an activity history. Admins see supplier identities; competitive supplier views mask competitors.
 
-## Key Features
+## Main features
 
-1. **British Auction Engine**:
-   - Configurable **Trigger Window ($X$ minutes)**: Monitors bidding activity in the closing minutes of the auction.
-   - Configurable **Extension Duration ($Y$ minutes)**: Extends the bid close time when trigger criteria are met.
-   - **Forced Bid Close Time**: Enforces a strict hard ceiling beyond which the auction can **never** extend.
-   - **Three Extension Trigger Modes**:
-     - Mode A: *Bid Received in Last $X$ Minutes*
-     - Mode B: *Any Supplier Rank Change in Last $X$ Minutes*
-     - Mode C: *Lowest Bidder ($L_1$) Rank Change in Last $X$ Minutes*
-   - Auto-closer background job that updates auction statuses (`ACTIVE` $\rightarrow$ `CLOSED` or `FORCE_CLOSED`).
+- Admin tools for RFQ scheduling, supplier accounts, platform settings, live monitoring, and audit history.
+- Supplier registration, RFQ browsing, quote submission, live rank updates, and auction countdowns.
+- Extension triggers for a bid received, any rank change, or a change to the leading bid.
+- Background checks that activate scheduled RFQs and close auctions at their deadline.
+- Real-time updates through WebSockets and role-aware access through JWT authentication.
 
-2. **Admin Portal (`port 5173`)**:
-   - RFQ creation with British Auction parameters ($X$, $Y$, and trigger modes).
-   - Quick Demo / Simulation switch (sets up rapid 3-minute test auctions with 1-minute extensions).
-   - Live British Auction monitoring with real-time bid updates, countdown timer, and extension tags.
-   - Carrier/Supplier management (create, edit, deactivate).
-   - **Dynamic System Settings**: Every parameter (platform title, currency, default $X$ and $Y$, trigger type, theme colors) is editable by admin with **zero hardcoding**.
+## Run locally
 
-3. **Supplier Portal (`port 5174`)**:
-   - Open registration and sign-in.
-   - Live auction dashboard and active shipment listings.
-   - Detailed bidding view with real-time countdown timer and extension notifications.
-   - Quote submission form with itemized freight charges, origin charges, destination charges, transit time, and validity.
-   - Real-time competitive leaderboard with masked competitor names and transparent pricing.
-   - Instant rank indicator ($L_1$, $L_2$, $L_3 \dots$) and personalized standing alerts.
+Start each part in its own terminal from the project root.
 
-4. **Design & Theme**:
-   - Corporate Navy (`#0F172A`) & Blue (`#2563EB`) enterprise theme.
-   - Strictly professional UI, SVG icons only, **zero emojis**.
+### 1. Backend
 
----
-
-## Quick Start Guide
-
-### 1. Start the Backend API Server
 ```bash
 cd backend
+python3 -m venv venv
 source venv/bin/activate
+pip install -r requirements.txt
 uvicorn app.main:app --host 0.0.0.0 --port 3000 --reload
 ```
-API runs on `http://localhost:3000`. Swagger documentation is available at `http://localhost:3000/docs`.
 
-To re-seed sample data at any time:
+To restore the sample data, run this from the project root:
+
 ```bash
-cd backend && ./venv/bin/python seed.py
+backend/venv/bin/python backend/seed.py
 ```
 
-### 2. Start the Admin Frontend
+### 2. Admin application
+
 ```bash
 cd admin-frontend
+npm install
 npm run dev
 ```
-Access Admin UI at `http://localhost:5173` (Login: `admin@rfq.com` / `admin123`).
 
-### 3. Start the Supplier Frontend
+Open `http://localhost:5173`. The seeded admin account is `admin@rfq.com` / `admin123`.
+
+### 3. Supplier application
+
 ```bash
 cd supplier-frontend
+npm install
 npm run dev
 ```
-Access Supplier Portal at `http://localhost:5174` (Login: `supplier1@test.com` / `supplier123` or register new).
 
----
+Open `http://localhost:5174`. The seeded supplier account is `supplier1@test.com` / `supplier123`; suppliers can also register from the site.
 
-## Deliverables Reference
-- **HLD & System Architecture**: [`docs/HLD.md`](file:///Users/ritikraj/gocomet/docs/HLD.md)
-- **Database Schema**: Documented in `docs/HLD.md` and implemented in [`backend/app/models.py`](file:///Users/ritikraj/gocomet/backend/app/models.py)
-- **Backend Code**: [`backend/`](file:///Users/ritikraj/gocomet/backend)
-- **Frontend Code**: [`admin-frontend/`](file:///Users/ritikraj/gocomet/admin-frontend) and [`supplier-frontend/`](file:///Users/ritikraj/gocomet/supplier-frontend)
+## Project documentation
 
-# gocomet-bidding
+- [Readable project guide](docs/readme.html)
+- [High-level design](docs/hld.html) — application components, data and event paths, auction rules, and request lifecycle.
+- [Schema design](docs/schema_design.html) — entity relationships, table fields, and data integrity notes.
+- [Backend models](backend/app/models.py) — SQLAlchemy table definitions.
+
+Open the HTML documents in a browser for their interactive diagrams. The project documentation reflects the current implementation.

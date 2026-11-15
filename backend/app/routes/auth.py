@@ -19,7 +19,8 @@ def register(body: UserRegister, db: Session = Depends(get_db)):
         email=body.email,
         hashed_password=hash_password(body.password),
         name=body.name,
-        role=body.role,
+        # Public registration is supplier-only; never trust a role sent by the client.
+        role="SUPPLIER",
         company=body.company,
         phone=body.phone,
     )

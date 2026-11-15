@@ -98,6 +98,21 @@ async def submit_bid(
 
     total = body.freight_charges + body.origin_charges + body.destination_charges
 
+    best_previous_bid = (
+        db.query(Bid)
+        .filter(Bid.rfq_id == rfq_id, Bid.supplier_id == current_user.id)
+        .order_by(Bid.total_amount.asc(), Bid.transit_time.asc(), Bid.created_at.asc(), Bid.id.asc())
+        .first()
+    )
+    if best_previous_bid and (
+        total > best_previous_bid.total_amount
+        or (total == best_previous_bid.total_amount and body.transit_time >= best_previous_bid.transit_time)
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Your new quote must improve your best quote: lower the total price, or keep the price and reduce transit days.",
+        )
+
     bid = Bid(
         rfq_id=rfq_id,
         supplier_id=current_user.id,

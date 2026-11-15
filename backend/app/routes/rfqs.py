@@ -90,7 +90,7 @@ def list_rfqs(
 def create_rfq(
     body: RfqCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin),
 ):
     # Validate forced close > bid close
     if body.forced_bid_close_time <= body.bid_close_time:
@@ -206,15 +206,11 @@ def update_rfq(
     rfq_id: str,
     body: RfqUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin),
 ):
     rfq = db.query(Rfq).filter(Rfq.id == rfq_id).first()
     if not rfq:
         raise HTTPException(status_code=404, detail="RFQ not found")
-
-    # Only admin or creator can edit
-    if current_user.role != "ADMIN" and rfq.created_by_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to edit this RFQ")
 
     # Only allow editing DRAFT RFQs
     if rfq.status != "DRAFT":
@@ -266,15 +262,12 @@ def update_rfq_status(
     rfq_id: str,
     status: str = Query(...),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin),
 ):
     """Manually change RFQ status (e.g., DRAFT -> ACTIVE)."""
     rfq = db.query(Rfq).filter(Rfq.id == rfq_id).first()
     if not rfq:
         raise HTTPException(status_code=404, detail="RFQ not found")
-
-    if current_user.role != "ADMIN" and rfq.created_by_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
 
     valid_transitions = {
         "DRAFT": ["ACTIVE"],
